@@ -1,7 +1,7 @@
 // Theme
-export { ThemeProvider, useTheme } from "./theme/ThemeProvider.ts";
+export { ThemeProvider, useTheme } from "./theme/ThemeProvider.tsx";
 export { ThemeToggle } from "./theme/ThemeToggle.tsx";
-export type { Theme } from "./theme/ThemeProvider.ts";
+export type { Theme } from "./theme/ThemeProvider.tsx";
 
 // Utilities
 export { cn } from "./utils.ts";
