@@ -22,7 +22,9 @@ export function PageHeader({
 	className,
 }: PageHeaderProps) {
 	return (
-		<div className={cn("flex items-start justify-between gap-4 py-6", className)}>
+		<div
+			className={cn("flex items-start justify-between gap-4 py-6", className)}
+		>
 			<div>
 				{breadcrumb && breadcrumb.length > 0 && (
 					<nav className="mb-1 flex items-center gap-1 text-xs text-muted-foreground">
@@ -30,7 +32,10 @@ export function PageHeader({
 							<span key={item.label} className="flex items-center gap-1">
 								{i > 0 && <span aria-hidden="true">/</span>}
 								{item.href ? (
-									<a href={item.href} className="hover:text-foreground transition-colors">
+									<a
+										href={item.href}
+										className="hover:text-foreground transition-colors"
+									>
 										{item.label}
 									</a>
 								) : (

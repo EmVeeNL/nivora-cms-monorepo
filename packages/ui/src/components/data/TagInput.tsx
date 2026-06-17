@@ -1,6 +1,6 @@
+import { Icon } from "@iconify/react";
 import type { KeyboardEvent } from "react";
 import { useState } from "react";
-import { Icon } from "@iconify/react";
 import { cn } from "../../utils.ts";
 
 interface TagInputProps {

@@ -1,6 +1,6 @@
 import type { FormEvent, ReactNode } from "react";
-import { Button } from "../ui/button.tsx";
 import { cn } from "../../utils.ts";
+import { Button } from "../ui/button.tsx";
 
 interface DataFormProps {
 	onSubmit: (e: FormEvent<HTMLFormElement>) => void | Promise<void>;

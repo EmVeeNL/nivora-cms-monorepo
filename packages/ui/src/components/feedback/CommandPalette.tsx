@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { Icon } from "@iconify/react";
 import {
 	Command,
 	CommandDialog,
@@ -9,7 +9,7 @@ import {
 	CommandList,
 	CommandSeparator,
 } from "cmdk";
-import { Icon } from "@iconify/react";
+import { useEffect } from "react";
 
 interface PaletteCommand {
 	id: string;
@@ -70,7 +70,10 @@ export function CommandPalette({
 										}}
 									>
 										{cmd.icon && (
-											<Icon icon={`tabler:${cmd.icon}`} className="mr-2 size-4" />
+											<Icon
+												icon={`tabler:${cmd.icon}`}
+												className="mr-2 size-4"
+											/>
 										)}
 										{cmd.label}
 									</CommandItem>
