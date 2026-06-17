@@ -5,16 +5,11 @@
   "compatibility_flags": ["nodejs_compat"],
   "main": "@tanstack/react-start/server-entry",
 
-  // ── Cloudflare bindings ────────────────────────────────────────────────────
-  // Replace IDs with real values from `wrangler d1 create`, `wrangler kv namespace create`, etc.
-  // Local dev uses Miniflare — IDs are arbitrary UUIDs for local state only.
-
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "nivora-cms-dev",
-      // Run `wrangler d1 create nivora-cms-dev` and paste the real ID for production
-      "database_id": "00000000-0000-4000-8000-000000000001",
+      "database_name": "nivora-cms-db",
+      "database_id": "e873ed16-c028-4a76-b1de-c31bb6b8fa6a",
       "migrations_dir": "../../packages/adapter-cloudflare/migrations"
     }
   ],
@@ -22,7 +17,6 @@
   "r2_buckets": [
     {
       "binding": "BUCKET",
-      // Run `wrangler r2 bucket create nivora-cms-assets` for production
       "bucket_name": "nivora-cms-assets"
     }
   ],
@@ -30,8 +24,7 @@
   "kv_namespaces": [
     {
       "binding": "CACHE",
-      // Run `wrangler kv namespace create CACHE` and paste the real ID for production
-      "id": "00000000000000000000000000000001"
+      "id": "2031f7ab84d44e17a76c6e2fcedd6eb2"
     }
   ],
 
