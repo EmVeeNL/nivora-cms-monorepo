@@ -11,3 +11,8 @@ dist-ssr
 .vinxi
 __unconfig*
 todos.json
+
+# Generated files
+**/src/routeTree.gen.ts
+**/module-registry.gen.ts
+**/api-registry.gen.ts

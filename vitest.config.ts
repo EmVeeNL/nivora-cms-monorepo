@@ -1,14 +1,6 @@
-import tailwindcss from "@tailwindcss/vite";
-import viteReact from "@vitejs/plugin-react";
-import { defineConfig } from "vitest/config";
+import { defineWorkspace } from "vitest/config";
 
-export default defineConfig({
-	plugins: [tailwindcss(), viteReact()],
-	resolve: {
-		alias: { "@": "/src" },
-	},
-	test: {
-		environment: "jsdom",
-		globals: true,
-	},
-});
+export default defineWorkspace([
+	"apps/*/vitest.config.ts",
+	"packages/*/vitest.config.ts",
+]);
