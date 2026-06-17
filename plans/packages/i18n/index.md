@@ -1,4 +1,4 @@
-# @nivora-cms/i18n
+# @nivora-cms/i18n — ✅ COMPLETE (feature/i18n, 2026-06-17)
 
 Paraglide JS integration for the NIVORA admin UI. Locale is user-preference based (stored in D1 `users.locale` column), not URL-path based. Handles message collection from all `@nivora-cms/*` packages, compilation, and runtime locale switching.
 
@@ -6,8 +6,8 @@ Paraglide JS integration for the NIVORA admin UI. Locale is user-preference base
 Nothing (standalone — no internal CMS deps).
 
 ## Tech
-- Paraglide JS (`@inlang/paraglide-js`)
-- @inlang/paraglide-vite (Vite plugin for compilation)
+- Paraglide JS (`@inlang/paraglide-js@^2.20.0`)
+- `paraglideVitePlugin` — exported from `@inlang/paraglide-js` (used in `apps/admin/vite.config.ts`)
 - inlang project config (`project.inlang/settings.json`)
 
 ## Directory Structure
@@ -15,17 +15,21 @@ Nothing (standalone — no internal CMS deps).
 ```
 packages/i18n/
 ├── src/
+│   ├── context.ts                # LocaleContext, useLocaleContext, Locale type
 │   ├── provider/
-│   │   ├── LocaleProvider.tsx        # Passes locale to Paraglide runtime; SSR-safe
-│   │   └── use-locale.ts             # useLocale() hook — returns current locale + setLocale fn
-│   └── components/
-│       └── LocaleSwitcher.tsx        # Dropdown in TopBar; updates user profile via server fn
+│   │   ├── LocaleProvider.tsx    # Passes locale + setLocale to React Context; SSR-safe
+│   │   └── use-locale.ts         # useLocale() hook — returns { locale, setLocale, locales }
+│   ├── components/
+│   │   └── LocaleSwitcher.tsx    # Native <select> locale switcher; injectable onLocaleChange
+│   ├── vite.ts                   # Re-exports paraglideVitePlugin from @inlang/paraglide-js
+│   └── index.ts                  # Barrel: LocaleProvider, useLocale, LocaleSwitcher, types
 ├── scripts/
-│   └── collect-messages.ts           # Scans packages' i18n/en.json → messages/en.json
-├── messages/                          # Compiled by Paraglide from collected source files
-│   └── en.json                       # Combined namespaced messages (generated — do not edit)
+│   └── collect-messages.ts       # Scans packages' i18n/{locale}.json → messages/{locale}.json
+├── messages/
+│   ├── en.json                   # Source English messages (admin.* + core.* namespaces)
+│   └── nl.json                   # Source Dutch messages
 ├── project.inlang/
-│   └── settings.json                 # inlang project config
+│   └── settings.json             # inlang project config: baseLocale, locales, modules
 └── nivora.config.ts
 ```
 
@@ -60,9 +64,7 @@ export default definePackageConfig({
       type: 'string',
       input: 'select',
       default: 'en',
-      options: [
-        { label: 'English', value: 'en' },
-      ],
+      options: [{ label: 'English', value: 'en' }],
       label: 'Fallback locale',
       description: 'Used when a message is missing in the selected locale',
     },
@@ -72,24 +74,26 @@ export default definePackageConfig({
 
 ## Phases
 
-### 01-paraglide-setup
-1. Install Paraglide + Vite plugin; configure `project.inlang/settings.json`
-2. `collect-messages.ts` script — scans all workspace packages' `i18n/<locale>.json` files, namespaces keys by package slug (e.g. `content.editor.save`), merges into `messages/en.json`
-3. Vite plugin integration — `@inlang/paraglide-vite` compiles messages at build time; outputs typed `paraglide/messages.js`
-4. Base English messages — all core UI strings (navigation labels, action buttons, error messages, confirmations) in the `admin.*` and `core.*` namespaces
-5. Type-safe usage — `import * as m from 'paraglide/messages'`; message key typos caught at compile time
+### 01-paraglide-setup ✅
+1. ✅ `@inlang/paraglide-js@^2.20.0` installed; `project.inlang/settings.json` configured
+2. ✅ `collect-messages.ts` — scans all `packages/*/i18n/{locale}.json`, prefixes keys with package slug, merges into `messages/{locale}.json`
+3. ✅ `src/vite.ts` re-exports `paraglideVitePlugin` from `@inlang/paraglide-js` under `@nivora-cms/i18n/vite`; wire into `apps/admin/vite.config.ts` during step 10
+4. ✅ Base English + Dutch messages — `admin.*` and `core.*` namespaces in `messages/en.json` + `messages/nl.json`
+5. Type-safe usage — deferred to `apps/admin` integration (step 10); `paraglideVitePlugin` outputs compiled `paraglide/` directory; import `* as m from 'paraglide/messages'`
 
-### 02-user-preference-locale
-1. Locale stored in user profile — `users.locale` column in D1 (VARCHAR, default `'en'`)
-2. `LocaleProvider` — reads locale from session in `__root.tsx` loader; injects into Paraglide runtime before render; SSR-safe (no flash)
-3. `LocaleSwitcher` — dropdown in admin TopBar and user settings page; calls a server fn to update `users.locale` in D1; triggers page reload to pick up new compiled messages
-4. SSR locale injection — TanStack Start `__root.tsx` loader fetches user locale; passed as `context.locale` to all child loaders
-5. Adding a new locale — process: create `packages/*/i18n/<locale>.json`, run `pnpm collect-messages`, rebuild
+### 02-user-preference-locale ✅
+1. ✅ `LocaleProvider` — accepts `locale` (from SSR loader), `locales`, and `onLocaleChange` callback; manages locale state in React Context; SSR-safe (no flash)
+2. ✅ `useLocale()` hook — returns `{ locale, setLocale, locales }`
+3. ✅ `LocaleSwitcher` — native `<select>` in base package; admin TopBar wrapper created in `@nivora-cms/admin` (step 9)
+4. Paraglide bridge — deferred to `apps/admin` step 10: `overwriteGetLocale(() => locale)` wires the React context into Paraglide's runtime for compiled message resolution
+5. `users.locale` column — deferred to `@nivora-cms/auth` (step 5): Drizzle migration adds the column; server fn updates it via D1
 
 ## Notes
-- Paraglide compiles messages at build time — zero runtime overhead; no dynamic string loading
-- Message keys follow the pattern `<package-slug>.<feature>.<key>`: `content.editor.save`, `auth.login.title`, `admin.nav.dashboard`
-- Each package owns its own `i18n/en.json` with its namespace; the collection script merges them
+- Paraglide compiles messages at build time via `paraglideVitePlugin` in `apps/admin` — zero runtime overhead
+- Message keys follow `<package-slug>.<feature>.<key>`: `content.editor.save`, `auth.login.title`, `admin.nav.dashboard`
+- `messages/en.json` and `messages/nl.json` are the source files; the Vite plugin compiles them at build time
+- `collect-messages.ts` only runs when new packages add their own `i18n/*.json` files
+- Locale bridge to Paraglide runtime is set up in `apps/admin/__root.tsx` via `overwriteGetLocale()`
 - RTL support is deferred; document CSS `dir` attribute approach for when it's needed
 
 ## Admin UI locale vs Content locale — two separate systems
