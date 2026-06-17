@@ -16,7 +16,7 @@
     "deploy": "vite build && wrangler deploy --config dist/server/wrangler.json"
   },
   "dependencies": {
-    "@cloudflare/vite-plugin": "^1.26.0",
+    "@cloudflare/vite-plugin": "^1.41.0",
     "@iconify/react": "^5.2.0",
     "@nivora-cms/ui": "workspace:*",
     "@tailwindcss/vite": "^4.1.18",
