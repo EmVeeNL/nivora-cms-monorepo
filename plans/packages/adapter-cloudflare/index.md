@@ -1,4 +1,4 @@
-# @nivora-cms/adapter-cloudflare
+# @nivora-cms/adapter-cloudflare — ✅ COMPLETE (commit f5f1738, 2026-06-17)
 
 Implements all `@nivora-cms/core` platform interfaces for Cloudflare. Owns the Drizzle schema, D1 migrations, R2 storage, KV cache, Queues, and Cron Triggers. This is the only adapter for v1.
 
