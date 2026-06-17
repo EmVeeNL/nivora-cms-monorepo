@@ -1,12 +1,12 @@
-import { Moon, Sun } from "lucide-react";
-import { useTheme } from "@/components/ThemeProvider";
-import { cn } from "@/lib/utils";
+import { Icon } from "@iconify/react";
+import { cn } from "../utils.ts";
+import { useTheme } from "./ThemeProvider.tsx";
 
 interface ThemeToggleProps {
 	className?: string;
 }
 
-function ThemeToggle({ className }: ThemeToggleProps) {
+export function ThemeToggle({ className }: ThemeToggleProps) {
 	const { theme, setTheme } = useTheme();
 	return (
 		<button
@@ -18,9 +18,11 @@ function ThemeToggle({ className }: ThemeToggleProps) {
 				className,
 			)}
 		>
-			{theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+			{theme === "dark" ? (
+				<Icon icon="tabler:sun" width={16} height={16} />
+			) : (
+				<Icon icon="tabler:moon" width={16} height={16} />
+			)}
 		</button>
 	);
 }
-
-export { ThemeToggle };
