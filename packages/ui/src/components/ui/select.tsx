@@ -1,5 +1,5 @@
-import * as SelectPrimitive from "@radix-ui/react-select";
 import { Icon } from "@iconify/react";
+import * as SelectPrimitive from "@radix-ui/react-select";
 import type { ComponentProps } from "react";
 import { cn } from "../../utils.ts";
 
@@ -39,7 +39,8 @@ export function SelectContent({
 			<SelectPrimitive.Content
 				className={cn(
 					"relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-					position === "popper" && "data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1",
+					position === "popper" &&
+						"data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1",
 					className,
 				)}
 				position={position}
@@ -48,7 +49,8 @@ export function SelectContent({
 				<SelectPrimitive.Viewport
 					className={cn(
 						"p-1",
-						position === "popper" && "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]",
+						position === "popper" &&
+							"h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]",
 					)}
 				>
 					{children}
@@ -87,7 +89,10 @@ export function SelectLabel({
 }: ComponentProps<typeof SelectPrimitive.Label>) {
 	return (
 		<SelectPrimitive.Label
-			className={cn("px-2 py-1.5 text-xs font-semibold text-muted-foreground", className)}
+			className={cn(
+				"px-2 py-1.5 text-xs font-semibold text-muted-foreground",
+				className,
+			)}
 			{...props}
 		/>
 	);

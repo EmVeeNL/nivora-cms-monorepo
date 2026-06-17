@@ -1,5 +1,5 @@
-import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { Icon } from "@iconify/react";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import type { ComponentProps } from "react";
 import { cn } from "../../utils.ts";
 
@@ -51,7 +51,10 @@ export function DialogContent({
 export function DialogHeader({ className, ...props }: ComponentProps<"div">) {
 	return (
 		<div
-			className={cn("flex flex-col space-y-1.5 text-center sm:text-left", className)}
+			className={cn(
+				"flex flex-col space-y-1.5 text-center sm:text-left",
+				className,
+			)}
 			{...props}
 		/>
 	);
@@ -60,7 +63,10 @@ export function DialogHeader({ className, ...props }: ComponentProps<"div">) {
 export function DialogFooter({ className, ...props }: ComponentProps<"div">) {
 	return (
 		<div
-			className={cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className)}
+			className={cn(
+				"flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
+				className,
+			)}
 			{...props}
 		/>
 	);
@@ -72,7 +78,10 @@ export function DialogTitle({
 }: ComponentProps<typeof DialogPrimitive.Title>) {
 	return (
 		<DialogPrimitive.Title
-			className={cn("text-lg font-semibold leading-none tracking-tight", className)}
+			className={cn(
+				"text-lg font-semibold leading-none tracking-tight",
+				className,
+			)}
 			{...props}
 		/>
 	);

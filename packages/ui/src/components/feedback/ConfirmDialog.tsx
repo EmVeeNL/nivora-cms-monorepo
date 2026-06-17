@@ -1,3 +1,4 @@
+import { Button } from "../ui/button.tsx";
 import {
 	Dialog,
 	DialogContent,
@@ -6,7 +7,6 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "../ui/dialog.tsx";
-import { Button } from "../ui/button.tsx";
 
 interface ConfirmDialogProps {
 	open: boolean;

@@ -25,10 +25,7 @@ export function CardHeader({ className, ...props }: ComponentProps<"div">) {
 export function CardTitle({ className, ...props }: ComponentProps<"h3">) {
 	return (
 		<h3
-			className={cn(
-				"font-semibold leading-none tracking-tight",
-				className,
-			)}
+			className={cn("font-semibold leading-none tracking-tight", className)}
 			{...props}
 		/>
 	);
@@ -36,10 +33,7 @@ export function CardTitle({ className, ...props }: ComponentProps<"h3">) {
 
 export function CardDescription({ className, ...props }: ComponentProps<"p">) {
 	return (
-		<p
-			className={cn("text-sm text-muted-foreground", className)}
-			{...props}
-		/>
+		<p className={cn("text-sm text-muted-foreground", className)} {...props} />
 	);
 }
 
@@ -49,9 +43,6 @@ export function CardContent({ className, ...props }: ComponentProps<"div">) {
 
 export function CardFooter({ className, ...props }: ComponentProps<"div">) {
 	return (
-		<div
-			className={cn("flex items-center p-6 pt-0", className)}
-			{...props}
-		/>
+		<div className={cn("flex items-center p-6 pt-0", className)} {...props} />
 	);
 }

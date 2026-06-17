@@ -1,16 +1,16 @@
+import { Icon } from "@iconify/react";
 import {
+	type ColumnDef,
 	flexRender,
 	getCoreRowModel,
 	getPaginationRowModel,
 	getSortedRowModel,
-	useReactTable,
-	type ColumnDef,
 	type SortingState,
+	useReactTable,
 } from "@tanstack/react-table";
-import { Icon } from "@iconify/react";
 import { useState } from "react";
-import { Button } from "../ui/button.tsx";
 import { cn } from "../../utils.ts";
+import { Button } from "../ui/button.tsx";
 
 interface DataTableProps<TData> {
 	data: TData[];
@@ -53,15 +53,25 @@ export function DataTable<TData>({
 												onClick={header.column.getToggleSortingHandler()}
 												className={cn(
 													"flex items-center gap-1",
-													header.column.getCanSort() && "cursor-pointer hover:text-foreground",
+													header.column.getCanSort() &&
+														"cursor-pointer hover:text-foreground",
 												)}
 											>
-												{flexRender(header.column.columnDef.header, header.getContext())}
+												{flexRender(
+													header.column.columnDef.header,
+													header.getContext(),
+												)}
 												{header.column.getIsSorted() === "asc" && (
-													<Icon icon="tabler:sort-ascending" className="size-3.5" />
+													<Icon
+														icon="tabler:sort-ascending"
+														className="size-3.5"
+													/>
 												)}
 												{header.column.getIsSorted() === "desc" && (
-													<Icon icon="tabler:sort-descending" className="size-3.5" />
+													<Icon
+														icon="tabler:sort-descending"
+														className="size-3.5"
+													/>
 												)}
 											</button>
 										)}
@@ -79,7 +89,10 @@ export function DataTable<TData>({
 								>
 									{row.getVisibleCells().map((cell) => (
 										<td key={cell.id} className="p-4">
-											{flexRender(cell.column.columnDef.cell, cell.getContext())}
+											{flexRender(
+												cell.column.columnDef.cell,
+												cell.getContext(),
+											)}
 										</td>
 									))}
 								</tr>

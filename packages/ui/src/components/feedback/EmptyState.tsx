@@ -1,7 +1,7 @@
-import type { ReactNode } from "react";
 import { Icon } from "@iconify/react";
-import { Button } from "../ui/button.tsx";
+import type { ReactNode } from "react";
 import { cn } from "../../utils.ts";
+import { Button } from "../ui/button.tsx";
 
 interface EmptyStateProps {
 	icon?: string;

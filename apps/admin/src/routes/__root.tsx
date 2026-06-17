@@ -1,8 +1,8 @@
+import { ThemeProvider } from "@nivora-cms/ui";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import type { ReactNode } from "react";
-import { ThemeProvider } from "@nivora-cms/ui";
 import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({

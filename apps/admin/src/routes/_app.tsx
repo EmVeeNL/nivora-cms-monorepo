@@ -1,11 +1,6 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { Icon } from "@iconify/react";
-import {
-	AppShell,
-	NavItem,
-	Sidebar,
-	ThemeToggle,
-} from "@nivora-cms/ui";
+import { AppShell, NavItem, Sidebar, ThemeToggle } from "@nivora-cms/ui";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_app")({
 	component: AppLayout,
@@ -42,7 +37,9 @@ function AppLayout() {
 							{NAV_ITEMS.map((item, i) => (
 								<NavItem
 									key={item.label}
-									icon={<Icon icon={`tabler:${item.icon}`} width={18} height={18} />}
+									icon={
+										<Icon icon={`tabler:${item.icon}`} width={18} height={18} />
+									}
 									label={item.label}
 									isActive={i === 0}
 								/>
@@ -51,7 +48,9 @@ function AppLayout() {
 							{BOTTOM_NAV.map((item) => (
 								<NavItem
 									key={item.label}
-									icon={<Icon icon={`tabler:${item.icon}`} width={18} height={18} />}
+									icon={
+										<Icon icon={`tabler:${item.icon}`} width={18} height={18} />
+									}
 									label={item.label}
 								/>
 							))}

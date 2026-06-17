@@ -1,5 +1,5 @@
-import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { Icon } from "@iconify/react";
+import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import type { ComponentProps } from "react";
 import { cn } from "../../utils.ts";
 
@@ -28,7 +28,10 @@ export function RadioGroupItem({
 			{...props}
 		>
 			<RadioGroupPrimitive.Indicator className="flex items-center justify-center">
-				<Icon icon="tabler:circle-filled" className="size-2.5 fill-primary text-primary" />
+				<Icon
+					icon="tabler:circle-filled"
+					className="size-2.5 fill-primary text-primary"
+				/>
 			</RadioGroupPrimitive.Indicator>
 		</RadioGroupPrimitive.Item>
 	);
