@@ -57,7 +57,7 @@ Ordered by dependency depth — build bottom-up.
 | 2 | `@nivora-cms/ui` | design system — admin + auth render from this |
 | 3 | `@nivora-cms/adapter-cloudflare` | DB, storage, queues — enables persistence |
 | 4 | `@nivora-cms/i18n` ✅ | standalone — needed early for admin UI strings |
-| 5 | `@nivora-cms/auth` | needs core + ui; owns /api/auth routes |
+| 5 | `@nivora-cms/auth` ✅ | needs core + ui; owns /api/auth routes |
 | 6 | `@nivora-cms/editor` | needs ui only |
 | 7 | `@nivora-cms/content` | needs core + editor + auth; owns /api/v1 routes |
 | 8 | `@nivora-cms/api` | thin orchestrator — assembles routers from content + auth |

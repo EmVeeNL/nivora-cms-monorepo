@@ -1,18 +1,17 @@
-# @nivora-cms/auth
+# @nivora-cms/auth — ✅ COMPLETE (feature/auth, 2026-06-17)
 
 Admin authentication and access control. Uses better-auth for session-based admin login. Manages ACL stored in D1. Issues OAuth2 tokens and JWTs for API consumers. Exports a Hono router (`apiRouter`) that `@nivora-cms/api` mounts at `/api/auth`.
 
 ## Depends on
 - `@nivora-cms/core` (platform interfaces, definePackageConfig)
-- `@nivora-cms/ui` (login page, auth UI components)
 - `@nivora-cms/adapter-cloudflare` (injected at runtime: Drizzle DB instance, KV for token storage)
 
 ## Tech
-- better-auth (session management, user CRUD, email+password, social OAuth providers)
-- Drizzle ORM (ACL schema — roles, permissions, assignments)
-- Zod v4 (auth input validation)
-- Hono (auth API routes — exported as `apiRouter`, mounted at `/api/auth`)
-- jose (JWT signing RS256, verification, key rotation)
+- better-auth@^1.6.19 (session management, email+password, tanstack-start cookies plugin)
+- @better-auth/drizzle-adapter@^1.6.19 (Drizzle adapter for D1)
+- drizzle-orm@^0.45.2 + sqlite-core (ACL schema — roles, permissions, assignments)
+- jose@^6.2.3 (JWT signing RS256, key rotation)
+- Hono@^4.12.25 (auth API routes — exported as `apiRouter`, mounted at `/api/auth`)
 
 ## Directory Structure
 
@@ -20,23 +19,28 @@ Admin authentication and access control. Uses better-auth for session-based admi
 packages/auth/
 ├── src/
 │   ├── entities/
-│   │   ├── users.entity.ts          # Extended user fields (avatar, locale, last_login)
-│   │   ├── roles.entity.ts
-│   │   ├── permissions.entity.ts
+│   │   ├── users.entity.ts          # Extended user fields (avatar, locale, lastLoginAt, isActive, invitedBy)
+│   │   ├── sessions.entity.ts       # better-auth session table
+│   │   ├── accounts.entity.ts       # better-auth OAuth accounts table
+│   │   ├── verifications.entity.ts  # better-auth verification tokens
+│   │   ├── roles.entity.ts          # ACL roles
+│   │   ├── permissions.entity.ts    # Dot-notation permission names
 │   │   ├── role-permissions.entity.ts
-│   │   └── user-roles.entity.ts
+│   │   ├── user-roles.entity.ts
+│   │   └── index.ts                 # Re-exports all entities
+│   ├── auth.ts                      # createAuth(db, config) factory + Auth type
 │   ├── services/
-│   │   ├── session.service.ts       # better-auth session helpers
-│   │   ├── acl.service.ts           # checkPermission, getUserPermissions
-│   │   ├── token.service.ts         # JWT issue/verify/revoke, key rotation
-│   │   └── invite.service.ts        # Admin invite flow
+│   │   ├── session.service.ts       # getSession(auth, headers)
+│   │   ├── acl.service.ts           # checkPermission, getUserPermissions, getUserRoles
+│   │   ├── token.service.ts         # JWT RS256: issueToken, verifyToken, revokeToken, rotateKeys
+│   │   └── invite.service.ts        # createInvite, acceptInvite
 │   ├── middleware/
-│   │   ├── require-session.ts       # TanStack Start server fn middleware
-│   │   ├── require-permission.ts    # Permission check middleware
-│   │   └── jwt-or-api-key.ts        # Hono middleware — verifies Bearer JWT or X-API-Key
+│   │   ├── require-session.ts       # requireSession(auth, headers) — throws UnauthorizedError
+│   │   ├── require-permission.ts    # requirePermission(userId, permission, db) — throws ForbiddenError
+│   │   └── jwt-or-api-key.ts        # Hono middleware — verifies Bearer JWT or X-API-Key header
 │   ├── api/                         # Hono router — exported for @nivora-cms/api
 │   │   ├── routes/
-│   │   │   ├── token.route.ts       # POST /api/auth/token (OAuth2 flows)
+│   │   │   ├── token.route.ts       # POST /api/auth/token (client_credentials)
 │   │   │   ├── refresh.route.ts     # POST /api/auth/refresh
 │   │   │   ├── revoke.route.ts      # POST /api/auth/revoke
 │   │   │   ├── me.route.ts          # GET /api/auth/me
@@ -44,55 +48,61 @@ packages/auth/
 │   │   └── router.ts                # Hono router; exports apiRouter + apiBasePath
 │   ├── admin/
 │   │   ├── fns/
-│   │   │   ├── users.fns.ts
-│   │   │   ├── roles.fns.ts
-│   │   │   └── invites.fns.ts
+│   │   │   ├── users.fns.ts         # listUsers, getUserById, deactivateUser, updateUserLocale
+│   │   │   ├── roles.fns.ts         # listRoles, createRole, assign/remove, permissions CRUD
+│   │   │   └── invites.fns.ts       # inviteUser
 │   │   └── routes/
-│   │       └── index.ts             # adminRouteFactory for /admin/users, /admin/roles
+│   │       └── index.ts             # adminRouteFactory stub (TanStack Router routes added in step 10)
 │   └── hooks/
-│       └── use-permission.ts        # React hook: usePermission('content.entries.write')
-├── migrations/
+│       └── use-permission.ts        # usePermission(permission, { userPermissions }) React hook
 ├── i18n/
-│   └── en.json
+│   └── en.json                      # auth.login.*, auth.users.*, auth.roles.*, auth.invite.*, etc.
 └── nivora.config.ts
 ```
 
+## Key Design Decisions
+
+- `createAuth(db, config)` factory — better-auth instance created per-request (Cloudflare Workers pattern)
+- Drizzle entities define all 8 tables; `drizzleAdapter(db, { provider: "sqlite", usePlural: true })` maps them
+- JWT stored in KV with RS256 key pair (`jwt:keys:current` / `jwt:keys:previous` for rotation grace period)
+- Revoked JTIs stored in KV with TTL matching token expiry
+- API key stored as SHA-256 hash — raw key shown once to user at generation time
+- `jwtOrApiKeyMiddleware` exported for `@nivora-cms/api` to protect all `/api/v1/*` routes
+
 ## Phases
 
-### 01-better-auth-setup
-1. Install + configure better-auth with D1 adapter (Drizzle)
-2. User entity additions — `avatar`, `locale` (user preference), `lastLoginAt`, `isActive`, `invitedBy`
-3. Session management — `getSession()` server function for TanStack Start loaders; session cookie config
-4. Email + password — invite-only flow (`super_admin` sends invite link); no open registration
-5. Login page component (in `@nivora-cms/ui`) — form, error states, redirect after login, SSR-safe
+### 01-better-auth-setup ✅
+1. ✅ better-auth + @better-auth/drizzle-adapter installed; createAuth(db, config) factory
+2. ✅ User entity — avatar, locale, lastLoginAt, isActive, invitedBy extended fields
+3. ✅ getSession(auth, headers) helper; requireSession middleware
+4. ✅ Email + password enabled; invite flow via sendVerificationEmail
+5. Login page — deferred to @nivora-cms/admin (step 9)
 
-### 02-acl
-1. Role schema — `roles` table: `name`, `slug`, `description`, `isSystem`; built-in: `super_admin`, `admin`, `editor`, `viewer`
-2. Permission schema — `permissions` table: dot-notation strings (`content.entries.write`) registered by packages via `nivora.config.ts`
-3. Role-permission + user-role assignment tables
-4. `checkPermission(userId, permission, db)` — D1 query; used in server fns and Hono middleware
-5. `requirePermissionMiddleware(permission)` — TanStack Start server fn middleware
-6. `jwtOrApiKeyMiddleware(env)` — Hono middleware for API routes (verifies JWT Bearer OR `X-API-Key` header); exports for `@nivora-cms/api` to use
-7. `usePermission(permission)` — React hook for conditional admin UI rendering
-8. Permission seeding — on package `afterInstall`, registers all permissions from all installed packages' `nivora.config.ts`
+### 02-acl ✅
+1. ✅ roles table — name, slug, description, isSystem
+2. ✅ permissions table — dot-notation name, packageSlug
+3. ✅ role_permissions + user_roles junction tables with composite PKs
+4. ✅ checkPermission(userId, permission, db), getUserPermissions, getUserRoles
+5. ✅ requirePermission(userId, permission, db) middleware
+6. ✅ jwtOrApiKeyMiddleware Hono middleware — Bearer JWT or X-API-Key
+7. ✅ usePermission(permission, { userPermissions }) React hook
+8. Permission seeding — deferred: registerPermissions() fn exported; called on package install
 
-### 03-api-auth
-1. OAuth2 token endpoint — `POST /api/auth/token` (client_credentials + authorization_code)
-2. Token refresh — `POST /api/auth/refresh` with rotation (old token invalidated)
-3. Token revocation — `POST /api/auth/revoke`; token stored as revoked in KV until expiry
-4. `GET /api/auth/me` — returns API consumer identity + granted scopes
-5. API key management — `POST /api/auth/keys` generates key (shown once); `DELETE /api/auth/keys/:id` revokes; stored as SHA-256 hash in D1
-6. JWT key rotation — RS256 key pair stored in KV; rotation schedule via Cron; old keys kept for verification grace period
-7. Scopes — derived from permissions: `content.entries.read` permission → `content:entries:read` scope
+### 03-api-auth ✅
+1. ✅ POST /api/auth/token — client_credentials grant
+2. ✅ POST /api/auth/refresh — token rotation
+3. ✅ POST /api/auth/revoke — JTI stored in KV
+4. ✅ GET /api/auth/me — returns sub + scope
+5. ✅ POST/DELETE /api/auth/keys — generate/revoke API keys
+6. ✅ rotateKeys(kv) — moves current → previous; called via CronAdapter
+7. Scope validation on /api/v1 routes — deferred to @nivora-cms/api (step 8)
 
 ### 04-admin-ui
-1. User list — `DataTable` with name, email, roles, status, last login; invite + deactivate actions
-2. Invite flow — send invite email (via `@nivora-cms/emails`) with signed token; accept invite → set password
-3. Role management — list roles, permission matrix heatmap, create custom role
-4. API keys page — list active keys, generate new key (secret shown once), revoke
+- Deferred to steps 9 + 10 (admin package + apps/admin integration)
+- User list DataTable, invite flow, role management, API keys page
 
 ## Notes
-- better-auth handles the admin session (cookie-based); OAuth2/JWT is entirely separate for API consumers
-- All ACL permissions are sourced from `permissions[]` in each package's `nivora.config.ts`; registered into D1 on package install
-- `jwtOrApiKeyMiddleware` is exported from this package and imported by `@nivora-cms/api` — auth logic stays here, not in the API assembler
-- Invite-only by default: set `ALLOW_OPEN_REGISTRATION=true` in `wrangler.toml` to allow self-signup
+- drizzle-orm bumped to ^0.45.2 (better-auth peer dep); also updated in adapter-cloudflare
+- better-auth handles admin session (cookie-based); OAuth2/JWT is entirely separate for API consumers
+- Admin UI locale (`users.locale`) is updated via `updateUserLocale(id, locale, db)` — bridges @nivora-cms/i18n
+- `betterAuth` baseURL and secret must come from Cloudflare Worker env vars (not hardcoded)
