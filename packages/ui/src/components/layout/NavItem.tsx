@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "../../utils.ts";
 
 interface NavItemProps {
 	icon: ReactNode;
@@ -9,7 +9,7 @@ interface NavItemProps {
 	onClick?: () => void;
 }
 
-function NavItem({
+export function NavItem({
 	icon,
 	label,
 	isActive = false,
@@ -35,5 +35,4 @@ function NavItem({
 	);
 }
 
-export { NavItem };
 export type { NavItemProps };

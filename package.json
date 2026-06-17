@@ -3,10 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@10.33.0",
   "scripts": {
     "dev": "pnpm --filter @nivora-cms/app-admin dev",
     "build": "pnpm --filter @nivora-cms/app-admin build",
     "deploy": "pnpm --filter @nivora-cms/app-admin deploy",
+    "typecheck": "pnpm -r run typecheck",
     "test": "vitest run --passWithNoTests",
     "format": "biome format .",
     "lint": "biome lint .",
