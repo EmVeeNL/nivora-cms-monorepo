@@ -1,4 +1,4 @@
-# @nivora-cms/ui
+# @nivora-cms/ui — ✅ COMPLETE (commit 52e8ff6, merged develop db6d6bd, 2026-06-17)
 
 The NIVORA design system. Tailwind CSS v4 + shadcn/ui primitives + a custom component library. Used by `@nivora-cms/admin`, `@nivora-cms/auth`, and `apps/admin` for all UI rendering.
 
