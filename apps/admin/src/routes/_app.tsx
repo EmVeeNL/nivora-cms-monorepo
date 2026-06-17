@@ -1,40 +1,30 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { Icon } from "@iconify/react";
 import {
-	BarChart2,
-	FileText,
-	HelpCircle,
-	Home,
-	Library,
-	Mail,
-	Package,
-	Settings,
-	Users,
-	Wallet,
-} from "lucide-react";
-
-import { NavItem } from "@/components/NavItem";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { AppShell } from "@/layouts/AppShell";
-import { Sidebar } from "@/layouts/Sidebar";
+	AppShell,
+	NavItem,
+	Sidebar,
+	ThemeToggle,
+} from "@nivora-cms/ui";
 
 export const Route = createFileRoute("/_app")({
 	component: AppLayout,
 });
 
 const NAV_ITEMS = [
-	{ icon: <Home size={18} />, label: "Home" },
-	{ icon: <Package size={18} />, label: "Products" },
-	{ icon: <Mail size={18} />, label: "Email" },
-	{ icon: <Users size={18} />, label: "Customers" },
-	{ icon: <Wallet size={18} />, label: "Payouts" },
-	{ icon: <BarChart2 size={18} />, label: "Analytics" },
-	{ icon: <Library size={18} />, label: "Library" },
-	{ icon: <FileText size={18} />, label: "Content" },
+	{ icon: "home", label: "Home" },
+	{ icon: "package", label: "Products" },
+	{ icon: "mail", label: "Email" },
+	{ icon: "users", label: "Customers" },
+	{ icon: "wallet", label: "Wallet" },
+	{ icon: "chart-bar-2", label: "Analytics" },
+	{ icon: "books", label: "Library" },
+	{ icon: "file-text", label: "Content" },
 ] as const;
 
 const BOTTOM_NAV = [
-	{ icon: <Settings size={18} />, label: "Settings" },
-	{ icon: <HelpCircle size={18} />, label: "Help" },
+	{ icon: "settings", label: "Settings" },
+	{ icon: "help-circle", label: "Help" },
 ] as const;
 
 function AppLayout() {
@@ -52,14 +42,18 @@ function AppLayout() {
 							{NAV_ITEMS.map((item, i) => (
 								<NavItem
 									key={item.label}
-									icon={item.icon}
+									icon={<Icon icon={`tabler:${item.icon}`} width={18} height={18} />}
 									label={item.label}
 									isActive={i === 0}
 								/>
 							))}
 							<div className="my-2 border-t border-border" />
 							{BOTTOM_NAV.map((item) => (
-								<NavItem key={item.label} icon={item.icon} label={item.label} />
+								<NavItem
+									key={item.label}
+									icon={<Icon icon={`tabler:${item.icon}`} width={18} height={18} />}
+									label={item.label}
+								/>
 							))}
 						</div>
 					}

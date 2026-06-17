@@ -7,7 +7,12 @@ interface TopBarProps {
 	ctaSlot?: ReactNode;
 }
 
-function TopBar({ titleSlot, searchSlot, actionsSlot, ctaSlot }: TopBarProps) {
+export function TopBar({
+	titleSlot,
+	searchSlot,
+	actionsSlot,
+	ctaSlot,
+}: TopBarProps) {
 	return (
 		<header
 			className="sticky top-0 z-10 flex shrink-0 items-center gap-4 border-b border-border bg-background px-6"
@@ -20,5 +25,3 @@ function TopBar({ titleSlot, searchSlot, actionsSlot, ctaSlot }: TopBarProps) {
 		</header>
 	);
 }
-
-export { TopBar };

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { TopBar } from "@/layouts/TopBar";
+import { TopBar } from "@nivora-cms/ui";
 
 export const Route = createFileRoute("/_app/")({ component: Home });
 

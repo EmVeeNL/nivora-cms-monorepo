@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "light" | "dark";
+export type Theme = "light" | "dark";
 
 interface ThemeContextValue {
 	theme: Theme;
@@ -10,14 +10,13 @@ interface ThemeContextValue {
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
-function ThemeProvider({ children }: { children: ReactNode }) {
+export function ThemeProvider({ children }: { children: ReactNode }) {
 	const [theme, setThemeState] = useState<Theme>(() => {
 		if (typeof document === "undefined") return "dark";
 		const m = document.cookie.match(/\btheme=([^;]+)/);
 		return (m?.[1] as Theme) ?? "dark";
 	});
 
-	// Sync React state with what the blocking script set in <head>
 	useEffect(() => {
 		const cls = document.documentElement.className;
 		if (cls === "light" || cls === "dark") setThemeState(cls);
@@ -37,11 +36,8 @@ function ThemeProvider({ children }: { children: ReactNode }) {
 	);
 }
 
-function useTheme(): ThemeContextValue {
+export function useTheme(): ThemeContextValue {
 	const ctx = useContext(ThemeContext);
 	if (!ctx) throw new Error("useTheme must be used within ThemeProvider");
 	return ctx;
 }
-
-export { ThemeProvider, useTheme };
-export type { Theme };
