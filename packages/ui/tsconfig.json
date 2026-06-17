@@ -1,9 +1,4 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["src/**/*.ts", "src/**/*.tsx", "env.d.ts"],
-  "compilerOptions": {
-    "paths": {
-      "@nivora-cms/core": ["../core/src/index.ts"]
-    }
-  }
+  "include": ["src/**/*.ts", "src/**/*.tsx", "env.d.ts"]
 }

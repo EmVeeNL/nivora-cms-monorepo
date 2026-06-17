@@ -5,10 +5,7 @@
     "types": ["vite/client"],
     "paths": {
       "#/*": ["./src/*"],
-      "@/*": ["./src/*"],
-      "@nivora-cms/ui": ["../../packages/ui/src/index.ts"],
-      "@nivora-cms/ui/utils": ["../../packages/ui/src/utils.ts"],
-      "@nivora-cms/ui/styles": ["../../packages/ui/src/theme/tokens.css"]
+      "@/*": ["./src/*"]
     }
   }
 }
