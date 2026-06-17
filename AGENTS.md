@@ -36,20 +36,109 @@ nivora-cms/
 │       └── tasks/                # One .md file per task
 │           └── TASK-NNN.md
 ├── public/                       # Static assets
+├── scripts/                      # Build-time code generation scripts (run via tsx)
+│   ├── lib/                      # Shared utilities for generator scripts
+│   ├── generate-modules.ts       # Discovers modules → emits module-registry.gen.ts
+│   └── collect-i18n.ts           # Merges per-module i18n files → src/i18n/merged/
+├── vite/
+│   └── plugins/
+│       └── modules.ts            # Vite plugin: runs generators on buildStart + watches for changes
 ├── src/
 │   ├── components/               # Reusable UI components
 │   │   └── ui/                   # shadcn/ui generated primitives (do not edit directly)
+│   ├── core/
+│   │   └── module/               # Module system type definitions and utilities
+│   │       ├── types.ts          # ModuleConfig, SettingsField, SidebarGroup, etc.
+│   │       ├── define.ts         # defineModuleConfig helper
+│   │       ├── merge.ts          # deepMergeModuleConfig utility
+│   │       └── index.ts          # barrel export
+│   ├── modules/                  # Local module source (each dir is one @nivora-cms/* module)
+│   │   └── <module-name>/        # See module directory structure below
+│   ├── i18n/
+│   │   └── merged/               # Auto-generated merged i18n output (gitignored)
 │   ├── layouts/                  # App shell and page-level layout components
 │   ├── lib/                      # Shared utilities (cn, etc.)
-│   ├── routes/                   # TanStack Start file-based routes
+│   ├── routes/                   # TanStack Start file-based routes (core shell only)
 │   └── styles.css                # Global CSS — Tailwind v4 entry point
 ├── AGENTS.md                     # This file
 ├── biome.json                    # Linter / formatter config
+├── nivora.config.json            # Project-level version tracking
 ├── package.json
 ├── tsconfig.json
 ├── vite.config.ts
 └── wrangler.jsonc                # Cloudflare Workers config
 ```
+
+---
+
+## Module Directory Structure
+
+Every feature area lives in a module under `src/modules/<name>/` (or as an npm `@nivora-cms/*` package). All modules follow this structure:
+
+```
+src/modules/<name>/
+├── nivora.config.ts    ← required — module identity and all config
+├── i18n/
+│   └── en.json         ← required — English translations (flat dot-notation keys)
+├── routes/
+│   ├── admin/
+│   │   ├── index.ts    ← exports adminRouteFactory: AdminRouteFactory
+│   │   └── *.tsx       ← admin page components (lazy-loaded)
+│   └── api/
+│       └── index.ts    ← API route handlers (placeholder until content API plan)
+├── components/         ← React components used across admin pages in this module
+├── widgets/            ← Dashboard widget configs (data source + size, minimal code)
+├── services/           ← Business logic (pure functions, no HTTP)
+├── schema/             ← Zod validation schemas
+├── types/              ← TypeScript types (inferred from schema + extras)
+├── assets/             ← Static assets served by this module
+├── database/
+│   ├── migrations/     ← SQL migration files (prefixed: 0001_name.sql)
+│   └── seeds/          ← Seed data files
+├── middleware/         ← Server middleware (auth guards, rate limits)
+├── emails/             ← Transactional email templates
+└── permissions.ts      ← RBAC permission constants (enforced in permissions plan)
+```
+
+### `nivora.config.ts` shape
+```ts
+import { defineModuleConfig } from '#/core/module/index.ts'
+
+export default defineModuleConfig({
+  name: '@nivora-cms/blog',     // npm namespace + module name
+  extends: '@nivora-cms/blog',  // only for local overwrites of npm packages
+
+  database: { migrations: './database/migrations', seeds: './database/seeds' },
+  dashboard: { widgets: [...], components: [...] },
+  overwrites: {},
+  search: [{ model: 'Post', fields: ['title', 'body'] }],
+  sidebar: [{ group: 'Content', order: 1, items: [{ label: 'Posts', icon: 'FileText', route: '/blog' }] }],
+  routes: { admin: './routes/admin', api: './routes/api' },
+  settings: { fields: [{ key: 'posts_per_page', type: 'number', label: 'Posts per page', default: 10 }] },
+  i18n: { messages: './i18n', defaultLocale: 'en' },
+  middleware: { api: ['./middleware/auth'], admin: ['./middleware/auth'] },
+  permissions: { file: './permissions.ts' },
+})
+```
+
+### Admin route factory convention
+```ts
+// routes/admin/index.ts
+import { createRoute, lazyRouteComponent } from '@tanstack/react-router'
+import type { AnyRoute } from '@tanstack/react-router'
+
+export const adminRouteFactory = (parentRoute: AnyRoute) =>
+  createRoute({
+    getParentRoute: () => parentRoute,
+    path: '/blog',
+    component: lazyRouteComponent(() => import('./BlogIndexPage')),
+  })
+```
+
+### Module overwrite semantics
+- Local module whose `name` matches an installed `@nivora-cms/*` package → auto-replaces + deep-merges config
+- Local module with explicit `extends` field → replaces that package regardless of local `name`
+- Merge strategies: `sidebar` by group label, `settings.fields` by key, `middleware` concatenated, `routes` replaced entirely
 
 ---
 
@@ -226,6 +315,9 @@ All commit messages **must** follow the [Conventional Commits v1.0.0](https://ww
 | `ui-kit` | Reusable UI components in `src/components/` |
 | `dashboard` | Dashboard page structure and sections |
 | `routing` | TanStack Router routes and loaders |
+| `modules` | Module system — `src/core/module/`, `src/modules/`, generator scripts |
+| `router` | `src/router.tsx` and route tree assembly |
+| `i18n` | Translation files, i18n collection scripts, Paraglide |
 | `deps` | Dependency installs or removals |
 | `plans` | Plan documents and task files in `plans/` |
 | `agents` | AGENTS.md |
@@ -450,6 +542,10 @@ pnpm dlx shadcn@latest add sidebar   # etc.
 ## Change Log
 
 ### 2026-06-17
+- Added Module Directory Structure section (Plan 02 — module system)
+- Added `modules`, `router`, `i18n` commit scopes
+- Added admin route factory convention and overwrite semantics
+- Updated repository structure with `scripts/`, `vite/plugins/`, `src/core/`, `src/modules/`, `src/i18n/`
 - Replaced gitflow develop-branch model with plan-branch-from-main strategy
 - Added Semantic Versioning section (major by hand, minor per plan, patch per task)
 - Added pre-commit checklist: `pnpm biome check --write` + `pnpm test` must pass before every commit
