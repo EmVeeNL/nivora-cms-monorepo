@@ -13,15 +13,15 @@
     "react": "^19.0.0"
   },
   "dependencies": {
-    "@better-auth/drizzle-adapter": "^1.6.19",
+    "@better-auth/drizzle-adapter": "^1.6.20",
     "@nivora-cms/core": "workspace:*",
-    "better-auth": "^1.6.19",
+    "better-auth": "^1.6.20",
     "drizzle-orm": "^0.45.2",
-    "hono": "^4.12.25",
+    "hono": "^4.12.26",
     "jose": "^6.2.3"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.0.0",
+    "@cloudflare/workers-types": "^4.20260621.1",
     "@types/react": "^19.0.0"
   }
 }
