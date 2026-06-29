@@ -16,7 +16,7 @@
     "deploy": "vite build && wrangler deploy --config dist/server/wrangler.json"
   },
   "dependencies": {
-    "@cloudflare/vite-plugin": "^1.26.0",
+    "@cloudflare/vite-plugin": "^1.42.3",
     "@iconify/react": "^5.2.0",
     "@nivora-cms/ui": "workspace:*",
     "@tailwindcss/vite": "^4.1.18",
@@ -39,8 +39,8 @@
     "@types/node": "^22.10.2",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
-    "@vitejs/plugin-react": "^6.0.1",
+    "@vitejs/plugin-react": "^6.0.3",
     "jsdom": "^28.1.0",
-    "vite": "^8.0.0"
+    "vite": "^8.1.0"
   }
 }

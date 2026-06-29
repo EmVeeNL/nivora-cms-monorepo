@@ -15,7 +15,7 @@
     "react": "^19.0.0"
   },
   "dependencies": {
-    "@inlang/paraglide-js": "^2.20.0"
+    "@inlang/paraglide-js": "^2.20.2"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",
